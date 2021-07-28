@@ -1,7 +1,5 @@
 package com.recruitment.sandbox;
 
-import static java.lang.System.*;
-
 import com.recruitment.sandbox.model.Customer;
 import com.recruitment.sandbox.model.Device;
 import java.math.BigDecimal;
@@ -18,9 +16,14 @@ public class SandboxApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SandboxApplication.class, args);
 
-		List<Customer> customers = new ArrayList<>(createCustomers());
-		Customer filteredCustomer = customers.stream().filter(SandboxApplication::isCustomerWithFixedDevice).collect(Collectors.toList()).get(0);
-		out.println("Jméno prvního zákazníka, který vlastní fixní linku = "+ filteredCustomer.getName());
+		List<Customer> customers = new ArrayList<>();
+		customers.addAll(createCustomers());
+
+		Customer outCustomer = customers.stream()
+			.filter((Customer customer ) -> { return isCustomerWithFixedDevice(customer);})
+			.collect(Collectors.toList())
+			.get(0);
+		System.out.println("Jmeno prvního nalezeného zákazníka, který vlastní fixní linku = "+ outCustomer.getName());
 	}
 
 	/**
@@ -29,7 +32,7 @@ public class SandboxApplication {
 	 * @return - returns true in case customer owns at least one fixed line device
 	 */
 	public static boolean isCustomerWithFixedDevice(Customer customer){
-		return (customer.getDevices().stream().anyMatch((Device device) -> !device.isMobile()));
+		return !customer.getDevices().stream().filter( (Device device) -> { return !device.isMobile();}).collect(Collectors.toList()).isEmpty();
 	}
 
 	/**
