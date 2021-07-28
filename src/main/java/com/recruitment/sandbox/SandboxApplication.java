@@ -6,7 +6,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -19,21 +18,10 @@ public class SandboxApplication {
 		List<Customer> customers = new ArrayList<>();
 		customers.addAll(createCustomers());
 
-		Customer outCustomer = customers.stream()
-			.filter((Customer customer ) -> { return isCustomerWithFixedDevice(customer);})
-			.collect(Collectors.toList())
-			.get(0);
-		System.out.println("Jmeno prvního nalezeného zákazníka, který vlastní fixní linku = "+ outCustomer.getName());
+		// zde napište implementaci, která v kolekci customers nalezne libovolného prvního zákazníka, který vlastní fixní linku a vypíše jeho jméno do konzole.
+
 	}
 
-	/**
-	 * Check whether customer owns at least one fixed line device
-	 * @param customer - customer
-	 * @return - returns true in case customer owns at least one fixed line device
-	 */
-	public static boolean isCustomerWithFixedDevice(Customer customer){
-		return !customer.getDevices().stream().filter( (Device device) -> { return !device.isMobile();}).collect(Collectors.toList()).isEmpty();
-	}
 
 	/**
 	 * creates two instances of Customer:
