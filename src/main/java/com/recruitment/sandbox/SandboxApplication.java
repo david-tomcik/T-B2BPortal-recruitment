@@ -3,9 +3,9 @@ package com.recruitment.sandbox;
 import com.recruitment.sandbox.model.Customer;
 import com.recruitment.sandbox.model.Device;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -18,7 +18,16 @@ public class SandboxApplication {
 		List<Customer> customers = new ArrayList<>();
 		customers.addAll(createCustomers());
 
-		// zde napište implementaci, která v kolekci customers nalezne libovolného prvního zákazníka, který vlastní fixní linku a vypíše jeho jméno do konzole.
+		// V kolekci customers najděte libovolného prvního zákazníka, který vlastní fixní linku a vypíšte jeho jméno do konzole.
+		Optional<Customer> customer = customers.stream().filter( c ->  c.getDevices().stream().anyMatch( d -> !d.isMobile())).findFirst();
+		System.out.println("zákazník = "+ (customer.isPresent() ? customer.get().getName() : ""));
+
+		// Do konzole vypište seznam jmen zařízení, které jsou unikátní (žádné jméno se se nesmí opakovat) a zároveň dražší než 20000Kč.
+		Set<String> devices = customers.stream().flatMap(c -> c.getDevices().stream().filter(d -> d.getPrice().compareTo(new BigDecimal(20000)) > 0).map(Device::getName)).collect(Collectors.toSet());
+		System.out.println("seznam unikátních jmen zařízení, které jsou dražší než 20000Kč = "+ devices);
+
+		// Výsledný seznam nalezených jmen zařízení seřaďte podle abecedy a vypište do konzole
+		System.out.println("seznam seřazen podle abecedy = "+ devices.stream().sorted().collect(Collectors.toList()));
 
 	}
 
@@ -26,7 +35,8 @@ public class SandboxApplication {
 	/**
 	 * creates two instances of Customer:
 	 *  1 - Pavel , has two devices (1. iPhone, 2. fixedLine)
-	 *  2 - Karel, has one device (1. samsungGalaxy)
+	 *  2 - Karel, has one device (1. Alcatel)
+	 *  3 - Pepa , has one device (1. iPhone)
 	 * @return - collection of customers
 	 */
 	private static Collection<Customer> createCustomers() {
@@ -42,13 +52,22 @@ public class SandboxApplication {
 				.build());
 
 		List<Device> devicesKarel = new ArrayList<>();
-		devicesKarel.add(Device.builder().id("device_3").name("samsungGalaxy").mobile(true).price(new BigDecimal("21000")).build());
+		devicesKarel.add(Device.builder().id("device_3").name("Alcatel").mobile(true).price(new BigDecimal("21000")).build());
 		customers.add(
 			Customer.builder()
 				.id("customer_2")
 				.name("Karel")
 				.devices(devicesKarel)
 				.build());
+
+		List<Device> devicesPepa = new ArrayList<>();
+		devicesPepa.add(Device.builder().id("device_1").name("iPhone").mobile(true).price(new BigDecimal("29000")).build());
+		customers.add(
+				Customer.builder()
+						.id("customer_3")
+						.name("Pepa")
+						.devices(devicesPepa)
+						.build());
 
 		return customers;
 	}
